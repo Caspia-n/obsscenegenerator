@@ -14,6 +14,7 @@ export default function Home() {
   const [newSceneName, setNewSceneName] = useState('');
   const [newSceneDescription, setNewSceneDescription] = useState('');
   const [creating, setCreating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchScenes();
@@ -31,10 +32,18 @@ export default function Home() {
     }
   };
 
+  const openModal = () => {
+    setNewSceneName('');
+    setNewSceneDescription('');
+    setError(null);
+    onOpen();
+  };
+
   const handleCreateScene = async () => {
     if (!newSceneName.trim()) return;
 
     setCreating(true);
+    setError(null);
     try {
       const response = await fetch('/api/scenes', {
         method: 'POST',
@@ -50,9 +59,13 @@ export default function Home() {
       if (response.ok) {
         const data = await response.json();
         router.push(`/builder/${data.scene.id}`);
+      } else {
+        const data = await response.json();
+        setError(data.error || 'Failed to create scene');
       }
     } catch (error) {
       console.error('Error creating scene:', error);
+      setError('An unexpected error occurred. Please try again.');
     } finally {
       setCreating(false);
     }
@@ -97,7 +110,7 @@ export default function Home() {
           <Button
             size="lg"
             color="primary"
-            onPress={onOpen}
+            onPress={openModal}
             className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold"
           >
             + Create New Scene
@@ -184,6 +197,11 @@ export default function Home() {
               value={newSceneDescription}
               onValueChange={setNewSceneDescription}
             />
+            {error && (
+              <div className="bg-danger-50 border border-danger-200 text-danger-600 px-4 py-2 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
             <div className="text-sm text-gray-400">
               Default resolution: 1920 x 1080
             </div>
