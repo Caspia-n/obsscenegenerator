@@ -10,7 +10,7 @@ export default function Home() {
   const router = useRouter();
   const [scenes, setScenes] = useState<SceneRecord[]>([]);
   const [loading, setLoading] = useState(true);
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onClose, getButtonProps } = useDisclosure();
   const [newSceneName, setNewSceneName] = useState('');
   const [newSceneDescription, setNewSceneDescription] = useState('');
   const [creating, setCreating] = useState(false);
@@ -97,7 +97,7 @@ export default function Home() {
           <Button
             size="lg"
             color="primary"
-            onPress={onOpen}
+            {...getButtonProps()}
             className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold"
           >
             + Create New Scene
